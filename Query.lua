@@ -82,19 +82,24 @@ function HandlePacketStat(a_Data, a_Host, a_Port)
 	for i = 1, 4 do
 		SuppliedToken = SuppliedToken * (2 ^ 8) + SuppliedTokenBytes[i]
 	end
-	if SuppliedToken == Token then
-		local Server = cRoot:Get():GetServer()
-		local MOTD = Server:GetDescription()
-		local GameType = "SMP"
-		local Map = "world"
-		local NumPlayers = tostring(Server:GetNumPlayers())
-		local MaxPlayers = tostring(Server:GetMaxPlayers())
-		local HostPort = "25565"
-		local HostIp = "127.0.0.1"
-		local Message = { MOTD, GameType, Map, NumPlayers, MaxPlayers, HostPort, HostIp }
-		local Data = PacketCreate(PACKET_TYPE_STAT, SessionId, table.concat(Message, "\0") .. string.char(0))
-		UDPSend(Data, a_Host, a_Port)
+	if SuppliedToken ~= Token then
+		return
 	end
+
+	local IniFile = cIniFile()
+	IniFile:ReadFile("settings.ini")
+	local Server = cRoot:Get():GetServer()
+
+	local MOTD = Server:GetDescription()
+	local GameType = "SMP"
+	local Map = cRoot:Get():GetDefaultWorld():GetName()
+	local NumPlayers = tostring(Server:GetNumPlayers())
+	local MaxPlayers = tostring(Server:GetMaxPlayers())
+	local HostPort = IniFile:GetValue("Server", "Ports")
+	local HostIp = "127.0.0.1"
+	local Message = { MOTD, GameType, Map, NumPlayers, MaxPlayers, HostPort, HostIp }
+	local Data = PacketCreate(PACKET_TYPE_STAT, SessionId, table.concat(Message, "\0") .. string.char(0))
+	UDPSend(Data, a_Host, a_Port)
 end
 
 function PacketCreate(a_PacketType, a_SessionId, a_Message)
