@@ -98,12 +98,16 @@ function HandlePacketStat(a_Data, a_Host, a_Port)
 	local Server = cRoot:Get():GetServer()
 
 	local MOTD = Server:GetDescription()
+	-- gametype is hardcoded to SMP as per http://wiki.vg/Query
 	local GameType = "SMP"
 	local Map = cRoot:Get():GetDefaultWorld():GetName()
 	local NumPlayers = tostring(Server:GetNumPlayers())
 	local MaxPlayers = tostring(Server:GetMaxPlayers())
 	local HostPort = g_IniFile:GetValue("Server", "Ports")
-	local HostIp = "127.0.0.1"
+	-- from MCServer source, file src/OSSupport/ServerHandleImpl.cpp
+	-- in cServerHandleImpl::Listen(UInt16 a_Port)
+	-- `memset(&name, 0, sizeof(name))` binds socket to all interfaces
+	local HostIp = "0.0.0.0"
 
 	local Message = { MOTD, GameType, Map, NumPlayers, MaxPlayers, HostPort, HostIp }
 	local Data = PacketCreate(PACKET_TYPE_STAT, SessionId, table.concat(Message, "\0") .. string.char(0))
