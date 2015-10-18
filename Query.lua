@@ -152,11 +152,19 @@ function StatData()
 	-- currently hardcoded
 	local Version = "1.8"
 	local Plugins = {}
-	for k, v in pairs(PluginManager:GetAllPlugins()) do
-		if v ~= false then
-			Plugins[#Plugins + 1] = string.format("%s v%s", k, tostring(v:GetVersion()))
-		end
-	end
+
+  cPluginManager:ForEachPlugin(
+    function (aPlugin)
+      -- If plugin object exists
+      if aPlugin ~= nil then
+
+        -- If plugin successfully loaded
+        if aPlugin:GetStatus() == 0 then
+          Plugins[#Plugins + 1] = string.format("%s v%s", aPlugin:GetName(), tostring(aPlugin:GetVersion()));
+        end
+      end
+    end
+  );
 
 	-- these keys are the ones in the key-value section of a full stat as listed in http://wiki.vg/Query
 	return {
@@ -170,7 +178,7 @@ function StatData()
 		game_id = "MINECRAFT",
 
 		version = Version,
-		plugins = string.format("MCServer %s: %s", Version, table.concat(Plugins, "; ")),
+		plugins = string.format("Сuberite %s: %s", Version, table.concat(Plugins, "; ")),
 		map = cRoot:Get():GetDefaultWorld():GetName(),
 		numplayers = tostring(Server:GetNumPlayers()),
 		maxplayers = tostring(Server:GetMaxPlayers()),
