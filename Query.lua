@@ -150,7 +150,7 @@ function StatData()
 	local PluginManager = cRoot:Get():GetPluginManager()
 
 	-- currently hardcoded
-	local Version = "1.8"
+	local Version = "1.11.2"
 	local Plugins = {}
 
   cPluginManager:ForEachPlugin(
